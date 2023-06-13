@@ -1,0 +1,25 @@
+name: Docker Image CI
+
+on:
+  push:
+    tags: [v*]
+
+env:
+  image: ghcr.io/${{ github.repository }}
+  tagged_image: ghcr.io/${{ github.repository }}:$(echo ${GITHUB_REF_NAME#v})
+
+jobs:
+  docker-image:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: "actions/checkout@v3"
+    - name: Configure Registry
+      run: docker login ghcr.io -u ${{ github.repository_owner }} --password ${{ github.token }}
+    - name: Build the image
+      run: docker build . --file Dockerfile --tag ${{ env.image }}
+    - name: Tag the image
+      run: docker tag ${{ env.image }} ${{ env.tagged_image }}
+    - name: Push the tagged image
+      run: docker push ${{ env.tagged_image }}
+    - name: Push the latest image
+      run: docker push ${{ env.image }}

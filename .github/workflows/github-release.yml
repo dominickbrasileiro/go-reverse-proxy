@@ -1,0 +1,31 @@
+name: GitHub Release
+
+on:
+  push:
+    tags: [v*]
+
+jobs:
+  build-and-create-release:
+    permissions: write-all
+    name: Build and Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1.19'
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: |
+          make install_deps
+      - name: Build binaries
+        run: |
+          ./build.sh
+      - name: Create release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          gh release create \
+          --title "$GITHUB_REF_NAME" \
+          --notes "" \
+          "$GITHUB_REF_NAME" \
+          ./build/*
