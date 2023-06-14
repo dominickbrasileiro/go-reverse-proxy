@@ -28,6 +28,11 @@ var rootCmd = &cobra.Command{
 		}
 
 		reverseProxy := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			req.Header.Set("X-Forwarded-For", req.RemoteAddr)
+			req.Header.Set("X-Forwarded-Host", req.Header.Get("Host"))
+			req.Header.Set("X-Forwarded-Port", port)
+			req.Header.Set("X-Forwarded-Proto", req.Proto)
+
 			req.Host = originServerURL.Host
 			req.URL.Host = originServerURL.Host
 			req.URL.Scheme = originServerURL.Scheme
