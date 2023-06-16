@@ -50,7 +50,6 @@ var rootCmd = &cobra.Command{
 		})
 
 		log.Fatal(http.ListenAndServe(host+":"+port, reverseProxy))
-
 	},
 }
 
